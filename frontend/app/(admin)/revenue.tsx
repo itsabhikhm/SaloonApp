@@ -105,27 +105,7 @@ export default function Revenue() {
     } finally { setExporting(false); }
   };
 
-  const askExport = () => {
-    if (Platform.OS === 'web') {
-      // On web, only CSV download via fetch + anchor
-      (async () => {
-        try {
-          const token = await AsyncStorage.getItem('token');
-          const res = await fetch(`${BASE}/api/admin/revenue/export.csv`, { headers: { Authorization: `Bearer ${token}` } });
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = 'colours-revenue.csv'; a.click();
-          URL.revokeObjectURL(url);
-        } catch (e: any) { Alert.alert('Export failed', e?.message || ''); }
-      })();
-      return;
-    }
-    Alert.alert('Export Revenue', 'Choose format', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Excel (CSV)', onPress: () => exportShare('csv') },
-      { text: 'PDF', onPress: () => exportShare('pdf') },
-    ]);
-  };
+  const askExport = () => setExportOpen(true);
 
   return (
     <SafeAreaView style={st.c} edges={['top']}>
