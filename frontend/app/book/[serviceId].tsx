@@ -30,6 +30,7 @@ export default function Book() {
       setPros(pRes.data);
       const matching = pRes.data.filter((p: any) => Array.isArray(p.service_ids) && p.service_ids.includes(serviceId));
       if (matching.length) setProId(matching[0].id);
+      else if (pRes.data.length) setProId(pRes.data[0].id);
     })();
   }, [serviceId]);
 

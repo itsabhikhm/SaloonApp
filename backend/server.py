@@ -28,7 +28,7 @@ JWT_ALG = "HS256"
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@salon.com")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
-app = FastAPI(title="Luxe Salon API")
+app = FastAPI(title="Colours Salon API")
 api = APIRouter(prefix="/api")
 bearer = HTTPBearer(auto_error=False)
 
@@ -366,7 +366,7 @@ async def admin_dashboard(_: dict = Depends(require_admin)):
 
 @api.get("/")
 async def root():
-    return {"message": "Luxe Salon API"}
+    return {"message": "Colours Salon API"}
 
 # -------- Seed --------
 async def seed_admin():
