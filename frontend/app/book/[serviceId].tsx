@@ -81,7 +81,7 @@ export default function Book() {
   return (
     <SafeAreaView style={st.c} edges={['top']}>
       <View style={st.header}>
-        <TouchableOpacity testID="book-back" onPress={() => router.back()}>
+        <TouchableOpacity testID="book-back" onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/(user)/home'); }}>
           <Ionicons name="arrow-back" color={theme.gold} size={24} />
         </TouchableOpacity>
         <Text style={st.title}>Book Appointment</Text>

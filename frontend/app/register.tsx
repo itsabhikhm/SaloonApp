@@ -33,7 +33,7 @@ export default function Register() {
     <KeyboardAvoidingView style={s.c} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={s.header}>
-          <TouchableOpacity testID="register-back" onPress={() => router.back()}>
+          <TouchableOpacity testID="register-back" onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/login'); }}>
             <Text style={s.back}>← Back</Text>
           </TouchableOpacity>
         </View>

@@ -24,7 +24,10 @@ export default function AdminDashboard() {
 
   useEffect(() => { load(); }, [load]);
 
-  const doLogout = async () => { await logout(); router.replace('/login'); };
+  const doLogout = async () => {
+    await logout();
+    try { router.replace('/login'); } catch {}
+  };
 
   if (loading) return <View style={st.center}><ActivityIndicator color={theme.gold} /></View>;
 

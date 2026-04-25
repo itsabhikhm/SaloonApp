@@ -9,10 +9,21 @@ export default function Profile() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const doLogout = () => {
+  const doLogout = async () => {
+    // Confirm via Alert; if user accepts, clear token and force navigation to login.
+    const proceed = () => {
+      logout().finally(() => {
+        try { router.replace('/login'); } catch {}
+      });
+    };
+    if (typeof window !== 'undefined' && typeof (globalThis as any).confirm === 'function') {
+      // Web fallback (Alert.alert is not interactive on RN-Web)
+      if ((globalThis as any).confirm('Sign out of Colours?')) proceed();
+      return;
+    }
     Alert.alert('Sign out of Colours?', 'You will need to sign in again.', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: async () => { await logout(); router.replace('/login'); } },
+      { text: 'Sign Out', style: 'destructive', onPress: proceed },
     ]);
   };
 
