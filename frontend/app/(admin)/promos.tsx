@@ -53,7 +53,7 @@ export default function Promos() {
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={st.modal}>
-          <View style={st.sheet}>
+          <ScrollView contentContainerStyle={st.sheet} keyboardShouldPersistTaps="handled">
             <Text style={st.sheetTitle}>New Promo Code</Text>
             <TextInput style={st.input} placeholder="Code (e.g., SUMMER25)" placeholderTextColor={theme.textSecondary} autoCapitalize="characters" value={form.code} onChangeText={v => setForm({ ...form, code: v })} />
             <TextInput style={st.input} placeholder="Discount %" placeholderTextColor={theme.textSecondary} value={form.discount_percent} onChangeText={v => setForm({ ...form, discount_percent: v })} keyboardType="numeric" />
@@ -62,7 +62,7 @@ export default function Promos() {
               <TouchableOpacity style={[st.btn, st.cancel]} onPress={() => setOpen(false)}><Text style={st.cancelTxt}>Cancel</Text></TouchableOpacity>
               <TouchableOpacity testID="create-promo" style={[st.btn, st.save]} onPress={create}><Text style={st.saveTxt}>CREATE</Text></TouchableOpacity>
             </View>
-          </View>
+          </ScrollView>
         </View>
       </Modal>
     </SafeAreaView>

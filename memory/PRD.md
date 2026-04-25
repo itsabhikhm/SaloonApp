@@ -27,6 +27,11 @@ Luxury salon management & booking mobile app branded **COLOURS** (tagline: HAIR 
 - **Payments** at `/api/payments/process` — MOCKED (returns success). Swap with Stripe/Razorpay later.
 - **SMS / Email confirmations** — MOCKED. The backend logs `[MOCK SMS]` / `[MOCK EMAIL]` lines on register + on booking. Booking response returns a `notifications` array describing what would be sent. To go live: plug Twilio (SMS) and Resend/SendGrid (Email) inside the `mock_notify()` helper in `server.py`.
 
+## Revenue Export
+- Admin Revenue tab has a **share button** (top-right) that exports the full revenue log.
+- Format options on mobile: **Excel (CSV)** or **PDF**. The system share sheet then lets the admin send it via WhatsApp, Mail, Drive, etc.
+- On web, clicking the share button downloads the CSV file directly.
+
 ## Auth
 - JWT Bearer tokens, 7-day expiry, AsyncStorage on mobile
 - Phone is the primary identifier; email is optional

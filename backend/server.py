@@ -345,6 +345,7 @@ async def add_revenue(data: RevenueIn, _: dict = Depends(require_admin)):
         "professional_id": data.professional_id,
         "professional_name": pro["name"],
         "date": data.date,
+        "time": data.time or "",
         "amount": data.amount,
         "target": pro.get("daily_target", 5000),
         "notes": data.notes or "",
@@ -353,6 +354,23 @@ async def add_revenue(data: RevenueIn, _: dict = Depends(require_admin)):
     await db.revenue.insert_one(doc)
     doc.pop("_id", None)
     return doc
+
+@api.get("/admin/revenue/export.csv")
+async def export_revenue_csv(_: dict = Depends(require_admin)):
+    from fastapi.responses import PlainTextResponse
+    items = await db.revenue.find({}, {"_id": 0}).sort("date", -1).to_list(2000)
+    lines = ["Date,Time,Professional,Amount (INR),Target (INR),Achievement %,Notes"]
+    total = 0
+    for r in items:
+        amt = r.get("amount", 0); tgt = r.get("target", 0) or 0
+        pct = round((amt / tgt * 100), 1) if tgt else 0
+        notes = (r.get("notes", "") or "").replace(",", " ").replace("\n", " ")
+        lines.append(f"{r.get('date','')},{r.get('time','') or '-'},{r.get('professional_name','')},{int(amt)},{int(tgt)},{pct}%,{notes}")
+        total += amt
+    lines.append("")
+    lines.append(f"TOTAL,,,{int(total)},,,")
+    csv = "\n".join(lines)
+    return PlainTextResponse(content=csv, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=colours-revenue.csv"})
 
 @api.get("/admin/revenue")
 async def list_revenue(_: dict = Depends(require_admin), date_filter: Optional[str] = None):

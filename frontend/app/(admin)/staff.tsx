@@ -70,7 +70,7 @@ export default function Staff() {
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={st.modal}>
-          <View style={st.sheet}>
+          <ScrollView contentContainerStyle={st.sheet} keyboardShouldPersistTaps="handled">
             <Text style={st.sheetTitle}>Add Professional</Text>
             <TextInput style={st.input} placeholder="Name" placeholderTextColor={theme.textSecondary} value={form.name} onChangeText={v => setForm({ ...form, name: v })} />
             <TextInput style={st.input} placeholder="Specialty (e.g., Master Stylist)" placeholderTextColor={theme.textSecondary} value={form.specialty} onChangeText={v => setForm({ ...form, specialty: v })} />
@@ -82,7 +82,7 @@ export default function Staff() {
               <TouchableOpacity style={[st.btn, st.cancel]} onPress={() => setOpen(false)}><Text style={st.cancelTxt}>Cancel</Text></TouchableOpacity>
               <TouchableOpacity testID="create-staff" style={[st.btn, st.save]} onPress={create}><Text style={st.saveTxt}>SAVE</Text></TouchableOpacity>
             </View>
-          </View>
+          </ScrollView>
         </View>
       </Modal>
     </SafeAreaView>
