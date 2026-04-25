@@ -1,0 +1,187 @@
+{
+  "theme": "Dark",
+  "archetype": "5 (Jewel & Luxury)",
+  "color_palette": {
+    "background": {
+      "primary": "#0A0A0A",
+      "surface": "#141414",
+      "surface_elevated": "#1C1C1E"
+    },
+    "brand": {
+      "primary": "#D4AF37",
+      "secondary": "#F3E5AB",
+      "muted": "#8C7326"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A1A1AA",
+      "inverse": "#0A0A0A"
+    },
+    "border": {
+      "default": "rgba(255, 255, 255, 0.1)",
+      "focus": "rgba(212, 175, 55, 0.5)"
+    },
+    "status": {
+      "success": "#27AE60",
+      "error": "#E74C3C"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Playfair Display",
+      "body": "Manrope"
+    },
+    "scale": {
+      "h1": {
+        "fontSize": 32,
+        "lineHeight": 40,
+        "fontFamily": "Playfair Display",
+        "letterSpacing": -0.5
+      },
+      "h2": {
+        "fontSize": 24,
+        "lineHeight": 32,
+        "fontFamily": "Playfair Display"
+      },
+      "h3": {
+        "fontSize": 20,
+        "lineHeight": 28,
+        "fontFamily": "Playfair Display"
+      },
+      "bodyLarge": {
+        "fontSize": 18,
+        "lineHeight": 26,
+        "fontFamily": "Manrope"
+      },
+      "body": {
+        "fontSize": 16,
+        "lineHeight": 24,
+        "fontFamily": "Manrope"
+      },
+      "caption": {
+        "fontSize": 12,
+        "lineHeight": 16,
+        "fontFamily": "Manrope",
+        "textTransform": "uppercase",
+        "letterSpacing": 1.2
+      }
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "2xl": 48
+  },
+  "components": {
+    "button": {
+      "primary": {
+        "backgroundColor": "#D4AF37",
+        "borderRadius": 0,
+        "paddingVertical": 16,
+        "paddingHorizontal": 24,
+        "alignItems": "center"
+      },
+      "secondary": {
+        "backgroundColor": "transparent",
+        "borderWidth": 1,
+        "borderColor": "#D4AF37",
+        "borderRadius": 0,
+        "paddingVertical": 16,
+        "paddingHorizontal": 24,
+        "alignItems": "center"
+      }
+    },
+    "card": {
+      "backgroundColor": "#141414",
+      "borderWidth": 1,
+      "borderColor": "rgba(255, 255, 255, 0.05)",
+      "borderRadius": 4,
+      "padding": 24
+    },
+    "input": {
+      "backgroundColor": "#0A0A0A",
+      "borderWidth": 1,
+      "borderColor": "rgba(255, 255, 255, 0.1)",
+      "borderRadius": 4,
+      "padding": 16,
+      "color": "#FFFFFF"
+    },
+    "bottom_tab": {
+      "backgroundColor": "#0A0A0A",
+      "activeTintColor": "#D4AF37",
+      "inactiveTintColor": "#A1A1AA",
+      "borderTopWidth": 1,
+      "borderTopColor": "rgba(255, 255, 255, 0.05)"
+    }
+  },
+  "layouts": {
+    "user_app": {
+      "navigation": [
+        "Home",
+        "Bookings",
+        "Profile"
+      ],
+      "home_structure": [
+        "Hero Promo Banner",
+        "Categories Grid (Hair, Spa, Nails, Facial)",
+        "Top Professionals List (Horizontal Scroll)"
+      ],
+      "booking_flow": [
+        "Select Service",
+        "Select Professional",
+        "Date & Time Picker",
+        "Apply Promo",
+        "Mock Payment"
+      ]
+    },
+    "admin_app": {
+      "navigation": [
+        "Dashboard",
+        "Bookings",
+        "Professionals",
+        "Services"
+      ],
+      "dashboard_structure": [
+        "Today's Revenue Widget",
+        "Target Achievement Progress",
+        "Recent Bookings List"
+      ]
+    }
+  },
+  "image_urls": [
+    {
+      "url": "https://images.pexels.com/photos/7195812/pexels-photo-7195812.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "hero_banner",
+      "description": "Stylish luxury beauty salon interior used for user home screen top promo banner"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1773904215697-e6c21fc27ac2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjBoYWlyJTIwc2Fsb24lMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzcxMjgyMjd8MA&ixlib=rb-4.1.0&q=85",
+      "category": "salon_interior",
+      "description": "Dimly lit luxurious barber chairs for category background or salon gallery"
+    },
+    {
+      "url": "https://images.pexels.com/photos/37229316/pexels-photo-37229316.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "service_spa",
+      "description": "Spa facial treatment used for service category thumbnail"
+    },
+    {
+      "url": "https://images.pexels.com/photos/3993455/pexels-photo-3993455.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "professional_portrait",
+      "description": "Hairstylist portrait used for booking professional selection screen"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1559069309-020e226c60f6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBoYWlyJTIwc3R5bGlzdCUyMHBvcnRyYWl0fGVufDB8fHx8MTc3NzEyODIyN3ww&ixlib=rb-4.1.0&q=85",
+      "category": "professional_portrait_2",
+      "description": "Portrait of woman in black top used for professional list"
+    }
+  ],
+  "accessibility_and_testing": {
+    "test_ids_required": true,
+    "test_id_convention": "kebab-case, role-based (e.g., login-submit-button)",
+    "contrast": "Ensure gold text on dark background meets 4.5:1 ratio"
+  },
+  "instructions_to_main_agent": "Use Expo React Native SDK 54. All styles must adhere to the provided color palette (Jewel & Luxury: Dark + Gold). Apply generic `data-testid` to all interactive elements for robust automated testing. Load `Playfair Display` for headings and `Manrope` for body via expo-font. Do NOT use Inter. Rely on borders instead of heavy shadows for elevation. The app contains dual logic (Admin/User), ensure navigation and state separation is managed correctly. Implement INR (₹) currency formatting for all payments and revenues. Build standard React Native styles mapping to this JSON guideline."
+}
