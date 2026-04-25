@@ -9,16 +9,18 @@ export default function Register() {
   const router = useRouter();
   const { register } = useAuth();
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
-    if (!name || !email || !password) return Alert.alert('Missing', 'Please fill name, email and password');
+    if (!name || !phone || !password) return Alert.alert('Missing', 'Name, mobile and password are required');
+    if (phone.replace(/\D/g, '').length < 7) return Alert.alert('Invalid', 'Enter a valid mobile number');
     setBusy(true);
     try {
-      await register(name.trim(), email.trim(), password, phone);
+      await register(name.trim(), phone.trim(), password, email.trim() || undefined);
+      Alert.alert('Welcome to Colours!', 'A confirmation has been sent to your mobile' + (email ? ' and email.' : '.'));
       router.replace('/(user)/home');
     } catch (e) {
       Alert.alert('Registration failed', formatErr(e));
@@ -39,8 +41,8 @@ export default function Register() {
           <Text style={s.title}>Create Account</Text>
           <Text style={s.sub}>Join the Colours family</Text>
           <TextInput testID="register-name-input" style={s.input} placeholder="Full Name" placeholderTextColor={theme.textSecondary} value={name} onChangeText={setName} />
-          <TextInput testID="register-email-input" style={s.input} placeholder="Email" placeholderTextColor={theme.textSecondary} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-          <TextInput testID="register-phone-input" style={s.input} placeholder="Phone (optional)" placeholderTextColor={theme.textSecondary} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+          <TextInput testID="register-phone-input" style={s.input} placeholder="Mobile number *" placeholderTextColor={theme.textSecondary} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+          <TextInput testID="register-email-input" style={s.input} placeholder="Email (optional)" placeholderTextColor={theme.textSecondary} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
           <TextInput testID="register-password-input" style={s.input} placeholder="Password" placeholderTextColor={theme.textSecondary} value={password} onChangeText={setPassword} secureTextEntry />
           <TouchableOpacity testID="register-submit-button" style={s.btn} onPress={submit} disabled={busy}>
             <Text style={s.btnText}>{busy ? 'Creating...' : 'CREATE ACCOUNT'}</Text>

@@ -25,8 +25,8 @@ export default function Profile() {
         <Ionicons name="person" size={48} color={theme.gold} />
       </View>
       <Text style={st.name}>{user?.name}</Text>
-      <Text style={st.email}>{user?.email}</Text>
-      {user?.phone ? <Text style={st.email}>{user.phone}</Text> : null}
+      {user?.phone ? <Text style={st.email}>📱 {user.phone}</Text> : null}
+      {user?.email ? <Text style={st.email}>✉️ {user.email}</Text> : null}
 
       <View style={st.menu}>
         <TouchableOpacity style={st.row} testID="profile-bookings" onPress={() => router.push('/(user)/bookings')}>

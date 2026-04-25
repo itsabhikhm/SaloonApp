@@ -71,12 +71,12 @@ async def require_admin(user: dict = Depends(get_current_user)) -> dict:
 # -------- Models --------
 class RegisterIn(BaseModel):
     name: str
-    email: EmailStr
+    phone: str
     password: str
-    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
 
 class LoginIn(BaseModel):
-    email: EmailStr
+    identifier: str  # phone or email
     password: str
 
 class ServiceIn(BaseModel):
@@ -120,29 +120,53 @@ class RateIn(BaseModel):
     rating: float
 
 # -------- Auth Routes --------
+def normalize_phone(p: str) -> str:
+    return ''.join(c for c in (p or '') if c.isdigit() or c == '+')
+
+def mock_notify(channel: str, to: str, message: str):
+    """MOCKED: logs SMS/email to console; replace with Twilio/SendGrid later."""
+    if not to:
+        return None
+    logging.info(f"[MOCK {channel.upper()}] to={to} msg={message}")
+    return {"channel": channel, "to": to, "message": message, "status": "sent"}
+
 @api.post("/auth/register")
 async def register(data: RegisterIn):
-    email = data.email.lower()
-    if await db.users.find_one({"email": email}):
+    phone = normalize_phone(data.phone)
+    if not phone or len(phone) < 7:
+        raise HTTPException(400, "Valid phone number is required")
+    email = data.email.lower() if data.email else None
+    if await db.users.find_one({"phone": phone}):
+        raise HTTPException(400, "Phone already registered")
+    if email and await db.users.find_one({"email": email}):
         raise HTTPException(400, "Email already registered")
     uid = str(uuid.uuid4())
     doc = {
-        "id": uid, "name": data.name, "email": email, "phone": data.phone or "",
+        "id": uid, "name": data.name, "phone": phone, "email": email or "",
         "password_hash": hash_pw(data.password), "role": "user",
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.users.insert_one(doc)
-    token = make_token(uid, email, "user")
-    return {"token": token, "user": {"id": uid, "name": data.name, "email": email, "role": "user", "phone": data.phone or ""}}
+    token = make_token(uid, email or phone, "user")
+    mock_notify("sms", phone, f"Welcome to Colours, {data.name}! Your account is ready.")
+    if email:
+        mock_notify("email", email, f"Welcome to Colours — sign in anytime.")
+    return {"token": token, "user": {"id": uid, "name": data.name, "phone": phone, "email": email or "", "role": "user"}}
 
 @api.post("/auth/login")
 async def login(data: LoginIn):
-    email = data.email.lower()
-    user = await db.users.find_one({"email": email})
+    ident = data.identifier.strip()
+    user = None
+    # try phone first
+    phone = normalize_phone(ident)
+    if phone:
+        user = await db.users.find_one({"phone": phone})
+    if not user and "@" in ident:
+        user = await db.users.find_one({"email": ident.lower()})
     if not user or not verify_pw(data.password, user["password_hash"]):
         raise HTTPException(401, "Invalid credentials")
-    token = make_token(user["id"], user["email"], user["role"])
-    return {"token": token, "user": {"id": user["id"], "name": user["name"], "email": user["email"], "role": user["role"], "phone": user.get("phone", "")}}
+    token = make_token(user["id"], user.get("email") or user.get("phone", ""), user["role"])
+    return {"token": token, "user": {"id": user["id"], "name": user["name"], "phone": user.get("phone", ""), "email": user.get("email", ""), "role": user["role"]}}
 
 @api.get("/auth/me")
 async def me(user: dict = Depends(get_current_user)):
@@ -277,6 +301,15 @@ async def create_booking(data: BookingIn, user: dict = Depends(get_current_user)
     }
     await db.bookings.insert_one(doc)
     doc.pop("_id", None)
+    # Mock SMS/Email confirmation
+    notifications = []
+    when_str = data.booking_datetime.replace("T", " ")[:16]
+    msg = f"Colours: Booking confirmed — {service['name']} with {pro['name']} on {when_str}. Total {int(total)} INR."
+    sms = mock_notify("sms", user.get("phone", ""), msg)
+    if sms: notifications.append(sms)
+    em = mock_notify("email", user.get("email", ""), msg)
+    if em: notifications.append(em)
+    doc["notifications"] = notifications
     return doc
 
 @api.get("/bookings")
@@ -376,9 +409,9 @@ async def seed_admin():
             "id": str(uuid.uuid4()),
             "name": "Admin",
             "email": ADMIN_EMAIL,
+            "phone": "",
             "password_hash": hash_pw(ADMIN_PASSWORD),
             "role": "admin",
-            "phone": "",
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
     elif not verify_pw(ADMIN_PASSWORD, existing["password_hash"]):
@@ -412,7 +445,13 @@ async def seed_demo():
 
 @app.on_event("startup")
 async def startup():
-    await db.users.create_index("email", unique=True)
+    # drop the strict unique index from older schema if present
+    try:
+        await db.users.drop_index("email_1")
+    except Exception:
+        pass
+    await db.users.create_index("email", sparse=True)
+    await db.users.create_index("phone", sparse=True)
     await seed_admin()
     await seed_demo()
 

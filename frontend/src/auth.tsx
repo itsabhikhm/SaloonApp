@@ -5,16 +5,16 @@ import { api } from './api';
 export type User = {
   id: string;
   name: string;
-  email: string;
-  role: 'user' | 'admin';
   phone?: string;
+  email?: string;
+  role: 'user' | 'admin';
 };
 
 type AuthCtx = {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
-  register: (name: string, email: string, password: string, phone?: string) => Promise<User>;
+  login: (identifier: string, password: string) => Promise<User>;
+  register: (name: string, phone: string, password: string, email?: string) => Promise<User>;
   logout: () => Promise<void>;
 };
 
@@ -39,15 +39,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const { data } = await api.post('/auth/login', { email, password });
+  const login = async (identifier: string, password: string) => {
+    const { data } = await api.post('/auth/login', { identifier, password });
     await AsyncStorage.setItem('token', data.token);
     setUser(data.user);
     return data.user as User;
   };
 
-  const register = async (name: string, email: string, password: string, phone?: string) => {
-    const { data } = await api.post('/auth/register', { name, email, password, phone });
+  const register = async (name: string, phone: string, password: string, email?: string) => {
+    const { data } = await api.post('/auth/register', { name, phone, password, email: email || undefined });
     await AsyncStorage.setItem('token', data.token);
     setUser(data.user);
     return data.user as User;

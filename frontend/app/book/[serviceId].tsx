@@ -57,7 +57,7 @@ export default function Book() {
       if (advanceAmt > 0) {
         await api.post('/payments/process', { amount: advanceAmt, method: 'card' });
       }
-      await api.post('/bookings', {
+      const res = await api.post('/bookings', {
         service_id: serviceId,
         professional_id: proId,
         booking_datetime: dt.toISOString(),
@@ -65,7 +65,11 @@ export default function Book() {
         advance_amount: advanceAmt,
         payment_method: advanceAmt > 0 ? 'card' : 'pay_at_salon',
       });
-      Alert.alert('Booking Confirmed!', `Your appointment is booked.${advanceAmt > 0 ? `\n\nAdvance ${formatINR(advanceAmt)} paid successfully.` : ''}`,
+      const notifs: any[] = res.data.notifications || [];
+      const channels = notifs.map(n => n.channel.toUpperCase()).join(' & ') || 'in-app';
+      Alert.alert(
+        'Booking Confirmed!',
+        `Your appointment is booked.${advanceAmt > 0 ? `\n\nAdvance ${formatINR(advanceAmt)} paid successfully.` : ''}\n\n📩 Confirmation sent via ${channels}.`,
         [{ text: 'View Bookings', onPress: () => router.replace('/(user)/bookings') }]);
     } catch (e) {
       Alert.alert('Booking failed', formatErr(e));

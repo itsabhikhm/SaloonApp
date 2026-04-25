@@ -10,15 +10,15 @@ import { Ionicons } from '@expo/vector-icons';
 export default function Login() {
   const router = useRouter();
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
-    if (!email || !password) return Alert.alert('Missing', 'Please fill all fields');
+    if (!identifier || !password) return Alert.alert('Missing', 'Please fill all fields');
     setBusy(true);
     try {
-      const u = await login(email.trim(), password);
+      const u = await login(identifier.trim(), password);
       router.replace(u.role === 'admin' ? '/(admin)/dashboard' : '/(user)/home');
     } catch (e) {
       Alert.alert('Login failed', formatErr(e));
@@ -27,7 +27,7 @@ export default function Login() {
     }
   };
 
-  const fillAdmin = () => { setEmail('admin@salon.com'); setPassword('admin123'); };
+  const fillAdmin = () => { setIdentifier('admin@salon.com'); setPassword('admin123'); };
 
   return (
     <KeyboardAvoidingView style={s.c} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -38,11 +38,11 @@ export default function Login() {
         </LinearGradient>
         <View style={s.form}>
           <Text style={s.title}>Welcome Back</Text>
-          <Text style={s.sub}>Sign in to book your Colours experience</Text>
+          <Text style={s.sub}>Sign in with your mobile number</Text>
           <TextInput
-            testID="login-email-input"
-            style={s.input} placeholder="Email" placeholderTextColor={theme.textSecondary}
-            value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+            testID="login-identifier-input"
+            style={s.input} placeholder="Mobile number" placeholderTextColor={theme.textSecondary}
+            value={identifier} onChangeText={setIdentifier} keyboardType="phone-pad" autoCapitalize="none" />
           <TextInput
             testID="login-password-input"
             style={s.input} placeholder="Password" placeholderTextColor={theme.textSecondary}
@@ -55,7 +55,7 @@ export default function Login() {
           </TouchableOpacity>
           <TouchableOpacity testID="login-admin-fill" onPress={fillAdmin} style={s.adminHint}>
             <Ionicons name="shield-checkmark-outline" color={theme.goldMuted} size={14} />
-            <Text style={s.adminHintText}>Tap to use Admin demo (admin@salon.com / admin123)</Text>
+            <Text style={s.adminHintText}>Admin demo: admin@salon.com / admin123</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
