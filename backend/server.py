@@ -113,6 +113,7 @@ class BookingIn(BaseModel):
 class RevenueIn(BaseModel):
     professional_id: str
     date: str  # YYYY-MM-DD
+    time: Optional[str] = ""  # HH:MM (24h)
     amount: float
     notes: Optional[str] = ""
 
@@ -356,10 +357,23 @@ async def add_revenue(data: RevenueIn, _: dict = Depends(require_admin)):
     return doc
 
 @api.get("/admin/revenue/export.csv")
-async def export_revenue_csv(_: dict = Depends(require_admin)):
+async def export_revenue_csv(
+    _: dict = Depends(require_admin),
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+):
     from fastapi.responses import PlainTextResponse
-    items = await db.revenue.find({}, {"_id": 0}).sort("date", -1).to_list(2000)
-    lines = ["Date,Time,Professional,Amount (INR),Target (INR),Achievement %,Notes"]
+    q: dict = {}
+    if date_from and date_to:
+        q["date"] = {"$gte": date_from, "$lte": date_to}
+    elif date_from:
+        q["date"] = {"$gte": date_from}
+    elif date_to:
+        q["date"] = {"$lte": date_to}
+    items = await db.revenue.find(q, {"_id": 0}).sort("date", -1).to_list(2000)
+    period = f"{date_from or 'beginning'} to {date_to or 'today'}"
+    lines = [f"Colours Revenue Report — {period}", ""]
+    lines.append("Date,Time,Professional,Amount (INR),Target (INR),Achievement %,Notes")
     total = 0
     for r in items:
         amt = r.get("amount", 0); tgt = r.get("target", 0) or 0
@@ -371,6 +385,23 @@ async def export_revenue_csv(_: dict = Depends(require_admin)):
     lines.append(f"TOTAL,,,{int(total)},,,")
     csv = "\n".join(lines)
     return PlainTextResponse(content=csv, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=colours-revenue.csv"})
+
+@api.get("/admin/revenue/range")
+async def revenue_range(
+    _: dict = Depends(require_admin),
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+):
+    """Returns filtered revenue rows (for in-app PDF generation)."""
+    q: dict = {}
+    if date_from and date_to:
+        q["date"] = {"$gte": date_from, "$lte": date_to}
+    elif date_from:
+        q["date"] = {"$gte": date_from}
+    elif date_to:
+        q["date"] = {"$lte": date_to}
+    items = await db.revenue.find(q, {"_id": 0}).sort("date", -1).to_list(2000)
+    return items
 
 @api.get("/admin/revenue")
 async def list_revenue(_: dict = Depends(require_admin), date_filter: Optional[str] = None):

@@ -17,6 +17,9 @@ export default function Revenue() {
   const [items, setItems] = useState<any[]>([]);
   const [pros, setPros] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  const monthStart = today.slice(0, 8) + '01';
+  const [filter, setFilter] = useState({ from: monthStart, to: today });
   const [refreshing, setRefreshing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -161,6 +164,41 @@ export default function Revenue() {
           );
         })}
       </ScrollView>
+
+      <Modal visible={exportOpen} transparent animationType="slide" onRequestClose={() => setExportOpen(false)}>
+        <View style={st.modal}>
+          <View style={st.sheet}>
+            <Text style={st.sheetTitle}>Export Revenue</Text>
+            <Text style={st.lbl}>QUICK RANGE</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+              <TouchableOpacity testID="preset-today" style={st.chip} onPress={() => setRangePreset('today')}><Text style={st.chipTxt}>Today</Text></TouchableOpacity>
+              <TouchableOpacity testID="preset-week" style={st.chip} onPress={() => setRangePreset('week')}><Text style={st.chipTxt}>Last 7d</Text></TouchableOpacity>
+              <TouchableOpacity testID="preset-month" style={st.chip} onPress={() => setRangePreset('month')}><Text style={st.chipTxt}>This month</Text></TouchableOpacity>
+              <TouchableOpacity testID="preset-all" style={st.chip} onPress={() => setRangePreset('all')}><Text style={st.chipTxt}>All time</Text></TouchableOpacity>
+            </View>
+            <Text style={st.lbl}>CUSTOM RANGE</Text>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <TextInput style={[st.input, { flex: 1 }]} placeholder="From YYYY-MM-DD" placeholderTextColor={theme.textSecondary} value={filter.from} onChangeText={v => setFilter({ ...filter, from: v })} />
+              <TextInput style={[st.input, { flex: 1 }]} placeholder="To YYYY-MM-DD" placeholderTextColor={theme.textSecondary} value={filter.to} onChangeText={v => setFilter({ ...filter, to: v })} />
+            </View>
+            <Text style={st.lbl}>FORMAT</Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+              <TouchableOpacity testID="export-csv" style={[st.btn, st.save, { flex: 1 }, exporting && { opacity: 0.6 }]} onPress={() => exportShare('csv')} disabled={exporting}>
+                <Text style={st.saveTxt}>EXCEL (CSV)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity testID="export-pdf" style={[st.btn, { flex: 1, backgroundColor: theme.surfaceElevated, borderWidth: 1, borderColor: theme.gold }, exporting && { opacity: 0.6 }]} onPress={() => exportShare('pdf')} disabled={exporting}>
+                <Text style={[st.saveTxt, { color: theme.gold }]}>PDF</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={{ color: theme.textSecondary, fontSize: 11, textAlign: 'center', marginTop: 4 }}>
+              {Platform.OS === 'web' ? 'Downloads on web · Share via Mail/WhatsApp on mobile' : 'Share sheet opens with Mail, WhatsApp, Drive & more'}
+            </Text>
+            <TouchableOpacity style={[st.btn, st.cancel, { marginTop: 8 }]} onPress={() => setExportOpen(false)} disabled={exporting}>
+              <Text style={st.cancelTxt}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={st.modal}>
