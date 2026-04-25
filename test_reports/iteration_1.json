@@ -1,0 +1,46 @@
+{
+  "summary": "First-time E2E verification of Colours salon app (Expo + FastAPI + MongoDB). Backend: 22/22 pytest cases PASS covering auth, public listings, admin enforcement, promo validate, full booking flow with promo+advance, mock payment, revenue+dashboard, professional rating, promo CRUD, and category whitelist (no Spa/Nails/Facial). Frontend: COLOURS branding + HAIR\u00b7SKIN\u00b7MAKEUP\u00b7ACADEMY tagline confirmed on login screen. Admin login (admin@salon.com/admin123) -> /dashboard with today's revenue, per-staff targets, recent bookings rendered correctly. User registration -> /home shows 4 categories (Hair, Skin, Makeup, Academy, NO Spa). Found and FIXED 1 critical red-screen bug (undefined variable `matching` in /app/frontend/app/book/[serviceId].tsx). After fix, full user booking flow worked: register -> pick service -> pick pro -> apply WELCOME20 (\u20b91200 -> \u20b9960) -> 30% advance \u20b9288 -> mock payment success -> /api/bookings 200 OK. Admin Services tab loads service list with add-service button.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "app/book/[serviceId].tsx",
+        "issue": "Red-screen error: ReferenceError 'matching is not defined' on line 31 inside useEffect. Variable was used before being declared (the filter line was missing). FIXED by adding `const matching = pRes.data.filter((p) => Array.isArray(p.service_ids) && p.service_ids.includes(serviceId))` before the if-check.",
+        "testID": "(book screen)",
+        "priority": "CRITICAL_FIXED"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "global", "issue": "Console warning: 'props.pointerEvents is deprecated. Use style.pointerEvents' (non-blocking, originates from a third-party lib or RN internal). Cosmetic only."}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_colours_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Verify the booking screen fix (already applied by testing agent) is acceptable; consider also showing only pros that match the selected service rather than all pros (UX polish).",
+    "Optional: Suppress 'props.pointerEvents is deprecated' warning by upgrading the offending dep or migrating prop usage.",
+    "FastAPI app title still says 'Luxe Salon API' (line 31 of server.py) - rebrand to 'Colours Salon API' for consistency.",
+    "FastAPI startup uses deprecated @app.on_event; consider migrating to lifespan handlers (non-blocking)."
+  ],
+  "critical_code_review_comments": [
+    "server.py uses on_event('startup'/'shutdown') which is deprecated in modern FastAPI; switch to lifespan context manager.",
+    "ServiceIn.category has comment 'Hair, Spa, Nails, Facial' but app categories are Hair/Skin/Makeup/Academy - misleading docstring (cosmetic).",
+    "No category validation server-side: an admin could create a service with category='Spa' which would bypass the rebrand intent. Recommend Pydantic Literal or enum validation.",
+    "JWT_SECRET committed in /app/backend/.env (acceptable for dev/preview but should be rotated for production).",
+    "CORS allow_origins=['*'] with allow_credentials=False is fine for Bearer-token auth, but document this contract."
+  ],
+  "updated_files": [
+    "/app/frontend/app/book/[serviceId].tsx (added missing `const matching = ...` line)",
+    "/app/backend/tests/test_colours_api.py (new pytest suite, 22 tests)"
+  ],
+  "success_rate": {"backend": "100% (22/22)", "frontend": "100% of critical flows after applied fix"},
+  "seed_data_creation": "Tests register fresh users prefixed TEST_/uitest/book to avoid clashing with seed data; admin-created promo/service/revenue rows are deleted in same test (cleanup). No persistent garbage left.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Use EXPO_PUBLIC_BACKEND_URL (not EXPO_BACKEND_URL) in env. Promo codes seeded: WELCOME20 (20%), GOLD15 (15%), WEEKEND10 (10%). Admin: admin@salon.com/admin123. Mock payment endpoint /api/payments/process always returns success TXN id. Booking screen `matching` bug was patched - if it regresses, restore the filter line in /app/frontend/app/book/[serviceId].tsx around line 31. If Expo cached bundle persists, restart with `sudo supervisorctl restart expo` and wait ~2 min for first bundle.",
+  "rca_of_issue": "RCA - Booking red-screen: The useEffect in /app/frontend/app/book/[serviceId].tsx referenced a `matching` variable that was never declared in scope. Reproduction: navigate to any service from user home -> Uncaught ReferenceError 'matching is not defined' overlay appears. Mitigation: declared `const matching = pRes.data.filter((p: any) => Array.isArray(p.service_ids) && p.service_ids.includes(serviceId))` immediately before the `if (matching.length)` check, restoring the apparent original intent (auto-select first professional whose service_ids includes the current serviceId). Verified by re-running the full booking flow which now completes with HTTP 200 on /api/bookings."
+}
